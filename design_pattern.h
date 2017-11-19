@@ -32,7 +32,7 @@ class Singleton
                 if (nullptr == a)
                 {
                     a = new Singleton();
-                    cout << "The singleton has been created." <<endl;
+                    cout << "The singleton has been created." << endl;
                 }
                 mtx.unlock();
             }
@@ -150,6 +150,77 @@ class SensorFactory
         }
 };
 
+/*
+ * 策略模式要点：
+ * 通过多态技术，为多种算法提供相同的调用接口。
+ * 具体方法：
+ * 1. 添加平台类，将算法基类聚合进来。
+ * 2. 提供一个接口为算法基类指定实际算法，再提供一个用于获取算法结果的接口。
+ * 与简单工厂模式相比，使用该模式可以使得当新增算法时无需修改工厂类。
+ */
+class Algorithm
+{
+    public:
+        virtual void getResult() {cout << "Get result by Algorithm A" << endl;}
+};
+
+class AlgorithmA: public Algorithm
+{
+    public:
+        void getResult() {cout << "Get result by Algorithm A" << endl;}
+};
+
+class AlgorithmB: public Algorithm
+{
+    public:
+        void getResult() {cout << "Get result by Algorithm B" << endl;}
+};
+
+class AlgorithmC: public Algorithm
+{
+    public:
+        void getResult() {cout << "Get result by Algorithm C" << endl;}
+};
+
+//提供统一接口的平台
+//应用了简单工厂模式
+class Strategy
+{
+    private:
+        Algorithm* algo;
+    public:
+        Strategy(): algo(nullptr) {}
+        void setStrategy(string s)
+        {
+            if (algo != nullptr)
+                delete algo;
+            if (s == "a")
+            {
+                algo = new AlgorithmA();
+            }
+            else if (s == "b")
+            {
+                algo = new AlgorithmB();
+            }
+            else if (s == "c")
+            {
+                algo = new AlgorithmC();
+            }
+            else
+            {
+                algo = new Algorithm();
+            }
+        }
+
+        void getStrategyResult()
+        {
+            algo->getResult();
+        }
+};
+
+/*
+ * 客户端类
+ */
 class Client
 {
     public:
@@ -169,6 +240,13 @@ class Client
             cout << s1->getData() << endl;
             cout << s2->getData() << endl;
             cout << s3->getData() << endl;
+        }
+        static void strategyPatternClient()
+        {
+            Strategy s;
+            s.setStrategy("a"); s.getStrategyResult();
+            s.setStrategy("b"); s.getStrategyResult();
+            s.setStrategy("c"); s.getStrategyResult();
         }
 };
 
